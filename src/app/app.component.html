@@ -9,11 +9,13 @@
 <div id='mapRoot'>
   <div id='container'></div>
   <div id="search">
-    <form>
-      <label>Name</label>
-      <input type="text" name="name">
-      <button>submit</button>
-    </form>
+    <mat-form-field>
+      <mat-select>
+        <mat-option *ngFor="let typhoon of TyphoonList" value="typhoon.StormName">
+          {{typhoon.StormName}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
   </div>
 </div>
 

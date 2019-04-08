@@ -1,23 +1,36 @@
 export class Typhoon {
-  typhoonId: number;
-  regionId: number;
-  urlLink: string;
-  birthDay: string;
-  EndDay: string;
-  DurationInSecond: number;
-  minPressure: string;
-  maxPressure: string;
-  name: string;
-  path: TyphoonPath[];
+  TyphoonStormId: number;
+  RegionId: number;
+  Year: number;
+  Number: number;
+  UrlLink: string;
+  StormName: string;
+  StormRegion: string;
+  BirthYMDHM: string;
+  DeathYMDHM: string;
+  Duration: string;
+  MinPressure: string;
+  InsertDate: string;
+  InsertedBy: string;
+  UpdateDate: string;
+  UpdatedBy: string;
+  TyphoonStormDetail: TyphoonStormDetail[];
 }
 
-export class TyphoonPath {
-  pathId: number;
-  typhoonId: number;
-  reportDate: string;
-  lat: string;
-  long: string;
-  pressure: string;
-  wind: string;
-  category: number;
+export class TyphoonStormDetail {
+  TyphoonStormDetailId: number;
+  TyphoonStormId: number;
+  Year: string;
+  Month: string;
+  Day: string;
+  Hour: string;
+  Lattitude: string;
+  Longitude: string;
+  Pressure: string;
+  Wind: string;
+  Class: string;
+  InsertDate: string;
+  InsertedBy: string;
+  UpdateDate: string;
+  UpdatedBy: string;
 }

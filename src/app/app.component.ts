@@ -144,10 +144,10 @@ export class AppComponent implements OnInit {
   }
 
   private draw(): void {
-    window.console.log('selected path: ' + this.selectedTyphoon);
+    window.console.log('selected path: ' + this.selectedTyphoon.StormName);
     let index = 0;
-    for (const detail of this.selectedTyphoon.path) {
-      window.console.log('lat=' + detail.lat + ';lng=' + detail.long);
+    for (const detail of this.selectedTyphoon.TyphoonStormDetail) {
+      window.console.log('lat=' + detail.Lattitude + ';lng=' + detail.Longitude);
       // const lngX = parseFloat(detail.long);
       // const latY = parseFloat(detail.lat);
       // const arr_dongHua = GPS.gcj_encrypt(latY, lngX);
@@ -158,22 +158,39 @@ export class AppComponent implements OnInit {
       // getTime = getTime.substring(getTime.length - 5, getTime.length);
       // //加上带有时间的图标标记
       const marker = new AMap.Marker({
-        position: [detail.long, detail.lat],
+        position: [detail.Longitude, detail.Lattitude],
         icon: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
       });
       this.map.add(marker);
       if (index > 0) {
         const typhonPath = [
-          [this.selectedTyphoon.path[index - 1].long, this.selectedTyphoon.path[index - 1].lat],
-          [this.selectedTyphoon.path[index].long, this.selectedTyphoon.path[index].lat]
+          [this.selectedTyphoon.TyphoonStormDetail[index - 1].Longitude, this.selectedTyphoon.TyphoonStormDetail[index - 1].Lattitude],
+          [detail.Longitude, detail.Lattitude]
         ];
+        let color = 'red';
+        if (this.selectedTyphoon.TyphoonStormDetail[index].Class === '1') {
+          color = 'green';
+        } else if (this.selectedTyphoon.TyphoonStormDetail[index].Class === '2') {
+          color = 'lightyellow';
+        } else if (this.selectedTyphoon.TyphoonStormDetail[index].Class === '3') {
+          color = 'yellow';
+        } else if (this.selectedTyphoon.TyphoonStormDetail[index].Class === '4') {
+          color = 'pink';
+        } else if (this.selectedTyphoon.TyphoonStormDetail[index].Class === '5') {
+          color = 'red';
+        }
         const polyLine = new AMap.Polyline({
           path: typhonPath,
-          strokeColor: 'red',
+          strokeColor: color,
           strokeWeight: 2,
         });
         this.map.add(polyLine);
+        this.map.add(polyLine);
+      } else {
+        this.map.setCenter([detail.Longitude, detail.Lattitude]);
+        this.map.setZoom(5);
       }
+
       index++;
     }
   }
