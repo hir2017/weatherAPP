@@ -24,8 +24,10 @@ export class AppComponent implements OnInit {
   toolbar: any;
   selectedArea: any;
   ctrlPressing: boolean;
+  drawnPath: any[];
 
   constructor(private typhoonService: TyphoonService) {
+    this.drawnPath = [];
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -144,6 +146,10 @@ export class AppComponent implements OnInit {
   }
 
   public onTyphoonSelection(): void {
+    if (this.drawnPath.length > 0) {
+      this.map.remove(this.drawnPath);
+      this.drawnPath = [];
+    }
     window.console.log('selected path: ' + this.selectedTyphoon.StormName);
     let index = 0;
     for (const detail of this.selectedTyphoon.TyphoonStormDetail) {
@@ -162,6 +168,7 @@ export class AppComponent implements OnInit {
         icon: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
       });
       this.map.add(marker);
+      this.drawnPath.push(marker);
       if (index > 0) {
         const typhonPath = [
           [this.selectedTyphoon.TyphoonStormDetail[index - 1].Longitude, this.selectedTyphoon.TyphoonStormDetail[index - 1].Lattitude],
@@ -185,7 +192,7 @@ export class AppComponent implements OnInit {
           strokeWeight: 2,
         });
         this.map.add(polyLine);
-        this.map.add(polyLine);
+        this.drawnPath.push(polyLine);
       } else {
         this.map.setCenter([detail.Longitude, detail.Lattitude]);
         this.map.setZoom(5);
@@ -200,7 +207,7 @@ export class AppComponent implements OnInit {
     this.typhoonService.getTyphoonList().subscribe(list => {
       this.TyphoonList = list;
       this.selectedTyphoon = list[0];
-      // this.draw();
+      this.onTyphoonSelection();
       window.console.log(list);
     });
   }
