@@ -143,7 +143,7 @@ export class AppComponent implements OnInit {
 
   }
 
-  private draw(): void {
+  public onTyphoonSelection(): void {
     window.console.log('selected path: ' + this.selectedTyphoon.StormName);
     let index = 0;
     for (const detail of this.selectedTyphoon.TyphoonStormDetail) {
@@ -200,7 +200,7 @@ export class AppComponent implements OnInit {
     this.typhoonService.getTyphoonList().subscribe(list => {
       this.TyphoonList = list;
       this.selectedTyphoon = list[0];
-      this.draw();
+      // this.draw();
       window.console.log(list);
     });
   }

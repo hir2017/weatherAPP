@@ -1,8 +1,9 @@
 import {BrowserModule} from '@angular/platform-browser';
-import {CommonModule} from '@angular/common';
-import {MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule} from '@angular/material';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NgModule} from '@angular/core';
+// import {CommonModule} from '@angular/common';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatFormFieldModule, MatOptionModule, MatSelectModule,} from '@angular/material';
 
 import {AppComponent} from './app.component';
 
@@ -12,14 +13,17 @@ import {AppComponent} from './app.component';
   ],
   imports: [
     BrowserModule,
-    CommonModule,
+    FormsModule,
+    // CommonModule,
     MatFormFieldModule,
     MatSelectModule,
     MatOptionModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
+
 export class AppModule {
 }

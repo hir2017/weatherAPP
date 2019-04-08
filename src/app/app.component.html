@@ -10,8 +10,8 @@
   <div id='container'></div>
   <div id="search">
     <mat-form-field>
-      <mat-select>
-        <mat-option *ngFor="let typhoon of TyphoonList" value="typhoon.StormName">
+      <mat-select [(ngModel)]="selectedTyphoon" (selectionChange)="onTyphoonSelection()">
+        <mat-option *ngFor="let typhoon of TyphoonList" [value]="typhoon">
           {{typhoon.StormName}}
         </mat-option>
       </mat-select>
