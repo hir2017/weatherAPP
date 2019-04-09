@@ -14,4 +14,6 @@ export class TyphoonService {
   getTyphoonList(): Observable<Typhoon[]> {
     return of(TyphoonList);
   }
+
+  // filterTyphoon(top)
 }

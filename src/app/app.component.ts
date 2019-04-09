@@ -22,12 +22,13 @@ export class AppComponent implements OnInit {
   TyphoonList: Typhoon[];
   mouseTool: any;
   toolbar: any;
-  selectedArea: any;
   ctrlPressing: boolean;
   drawnPath: any[];
+  circles: any[];
 
   constructor(private typhoonService: TyphoonService) {
     this.drawnPath = [];
+    this.circles = [];
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -134,14 +135,65 @@ export class AppComponent implements OnInit {
     //   window.console.log(e);
     // }
 
-    // map.on('click', function(ev) {
-    //   const lnglat = ev.lnglat;
-    //   const marker = new AMap.Marker({
-    //     icon: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
-    //     position: [lnglat.getLng(), lnglat.getLat()]
-    //   });
-    //   map.add(marker);
-    // });
+    const lineColor = 'black';
+    this.map.on('click', (ev) => {
+      if (this.ctrlPressing) {
+        this.map.remove(this.circles);
+        const lnglat = ev.lnglat;
+        const circle = new AMap.Circle({
+          center: lnglat, // 圆心位置  //[lnglat.getLng(), lnglat.getLat()]
+          radius: 5000,
+          strokeColor: lineColor,
+          strokeOpacity: 1,
+          strokeWeight: 1,
+          fillColor: 'red',
+          fillOpacity: 0.35
+        });
+        const circle2 = new AMap.Circle({
+          center: lnglat, // 圆心位置  //[lnglat.getLng(), lnglat.getLat()]
+          radius: 15000,
+          strokeColor: lineColor,
+          strokeOpacity: 1,
+          strokeWeight: 1,
+          fillColor: 'pink',
+          fillOpacity: 0.35
+        });
+        const circle3 = new AMap.Circle({
+          center: lnglat, // 圆心位置  //[lnglat.getLng(), lnglat.getLat()]
+          radius: 25000,
+          strokeColor: lineColor,
+          strokeOpacity: 1,
+          strokeWeight: 1,
+          fillColor: 'yellow',
+          fillOpacity: 0.35
+        });
+        const circle4 = new AMap.Circle({
+          center: lnglat, // 圆心位置  //[lnglat.getLng(), lnglat.getLat()]
+          radius: 50000,
+          strokeColor: lineColor,
+          strokeOpacity: 1,
+          strokeWeight: 1,
+          fillColor: 'lightyellow',
+          fillOpacity: 0.35
+        });
+        const circle5 = new AMap.Circle({
+          center: lnglat, // 圆心位置  //[lnglat.getLng(), lnglat.getLat()]
+          radius: 100000,
+          strokeColor: lineColor,
+          strokeOpacity: 1,
+          strokeWeight: 3,
+          fillColor: 'green',
+          fillOpacity: 0.35
+        });
+        this.map.add([circle, circle2, circle3, circle4, circle5]);
+        this.circles.push(circle5);
+        this.circles.push(circle4);
+        this.circles.push(circle3);
+        this.circles.push(circle2);
+        this.circles.push(circle);
+      }
+
+    });
 
   }
 
@@ -165,7 +217,8 @@ export class AppComponent implements OnInit {
       // //加上带有时间的图标标记
       const marker = new AMap.Marker({
         position: [detail.Longitude, detail.Lattitude],
-        icon: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
+        // icon: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',  //32*32
+        icon: './assets/images/pin.png'
       });
       this.map.add(marker);
       this.drawnPath.push(marker);
