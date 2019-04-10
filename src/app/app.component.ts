@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {HostListener} from '@angular/core';
 import {Typhoon} from './typhoon';
 import {TyphoonService} from './typhoon.service';
+import {tick} from '@angular/core/testing';
 
 declare var AMap: any;
 
@@ -23,12 +24,15 @@ export class AppComponent implements OnInit {
   mouseTool: any;
   toolbar: any;
   ctrlPressing: boolean;
-  drawnPath: any[];
+  markers: any[];
   circles: any[];
+  path: any[];
+  title: string;
 
   constructor(private typhoonService: TyphoonService) {
-    this.drawnPath = [];
+    this.markers = [];
     this.circles = [];
+    this.title = 'Weather APP';
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -135,62 +139,53 @@ export class AppComponent implements OnInit {
     //   window.console.log(e);
     // }
 
-    const lineColor = 'black';
+    const redius = [0, 5000, 15000, 25000, 50000, 100000, 100000000];
+    const fillColors = ['DARKRED', 'red', 'DEEPPINK', 'DARKORANGE', 'AQUAMARINE'];
+    const normalLineColor = 'black';
+    const strokeHightColor = 'red';
+    const normalStrokeWeight = 1;
+    const highStrokeWeight = 2;
     this.map.on('click', (ev) => {
       if (this.ctrlPressing) {
         this.map.remove(this.circles);
+        this.circles = [];
+
         const lnglat = ev.lnglat;
-        const circle = new AMap.Circle({
-          center: lnglat, // 圆心位置  //[lnglat.getLng(), lnglat.getLat()]
-          radius: 5000,
-          strokeColor: lineColor,
-          strokeOpacity: 1,
-          strokeWeight: 1,
-          fillColor: 'red',
-          fillOpacity: 0.35
-        });
-        const circle2 = new AMap.Circle({
-          center: lnglat, // 圆心位置  //[lnglat.getLng(), lnglat.getLat()]
-          radius: 15000,
-          strokeColor: lineColor,
-          strokeOpacity: 1,
-          strokeWeight: 1,
-          fillColor: 'pink',
-          fillOpacity: 0.35
-        });
-        const circle3 = new AMap.Circle({
-          center: lnglat, // 圆心位置  //[lnglat.getLng(), lnglat.getLat()]
-          radius: 25000,
-          strokeColor: lineColor,
-          strokeOpacity: 1,
-          strokeWeight: 1,
-          fillColor: 'yellow',
-          fillOpacity: 0.35
-        });
-        const circle4 = new AMap.Circle({
-          center: lnglat, // 圆心位置  //[lnglat.getLng(), lnglat.getLat()]
-          radius: 50000,
-          strokeColor: lineColor,
-          strokeOpacity: 1,
-          strokeWeight: 1,
-          fillColor: 'lightyellow',
-          fillOpacity: 0.35
-        });
-        const circle5 = new AMap.Circle({
-          center: lnglat, // 圆心位置  //[lnglat.getLng(), lnglat.getLat()]
-          radius: 100000,
-          strokeColor: lineColor,
-          strokeOpacity: 1,
-          strokeWeight: 3,
-          fillColor: 'green',
-          fillOpacity: 0.35
-        });
-        this.map.add([circle, circle2, circle3, circle4, circle5]);
-        this.circles.push(circle5);
-        this.circles.push(circle4);
-        this.circles.push(circle3);
-        this.circles.push(circle2);
-        this.circles.push(circle);
+        const closestPos = AMap.GeometryUtil.closestOnLine(lnglat, this.path);
+        const distance = AMap.GeometryUtil.distance(lnglat, closestPos);
+        window.console.log('closest pos is ' + closestPos + '; distance is ' + distance);
+
+        let lineColor;
+        let lineWeight;
+        let lineStyle;
+        let lineOpacity;
+
+        for (let i = 1; i < redius.length - 1; i++) {
+          if (redius[i - 1] <= distance && redius[i + 1] >= distance) {
+            lineColor = strokeHightColor;
+            lineWeight = highStrokeWeight;
+            lineStyle = 'solid';
+            lineOpacity = 0.8;
+          } else {
+            lineColor = normalLineColor;
+            lineWeight = normalStrokeWeight;
+            lineStyle = 'dashed';
+            lineOpacity = 0.3;
+          }
+
+          const circle = new AMap.Circle({
+            center: lnglat, // 圆心位置  //[lnglat.getLng(), lnglat.getLat()]
+            radius: redius[i],
+            strokeColor: lineColor,
+            strokeWeight: lineWeight,
+            fillColor: fillColors[i - 1],
+            strokeOpacity: 1,
+            fillOpacity: 0.35,
+            strokeStyle: lineStyle
+          });
+          this.circles.push(circle);
+        }
+        this.map.add(this.circles);
       }
 
     });
@@ -198,14 +193,21 @@ export class AppComponent implements OnInit {
   }
 
   public onTyphoonSelection(): void {
-    if (this.drawnPath.length > 0) {
-      this.map.remove(this.drawnPath);
-      this.drawnPath = [];
+    if (this.markers.length > 0) {
+      this.map.remove(this.markers);
+      this.markers = [];
     }
+    if (this.circles.length > 0) {
+      this.map.remove(this.circles);
+      this.circles = [];
+    }
+    this.path = [];
     window.console.log('selected path: ' + this.selectedTyphoon.StormName);
     let index = 0;
     for (const detail of this.selectedTyphoon.TyphoonStormDetail) {
+      const positon = [detail.Longitude, detail.Lattitude];
       window.console.log('lat=' + detail.Lattitude + ';lng=' + detail.Longitude);
+      this.path.push(positon);
       // const lngX = parseFloat(detail.long);
       // const latY = parseFloat(detail.lat);
       // const arr_dongHua = GPS.gcj_encrypt(latY, lngX);
@@ -216,16 +218,16 @@ export class AppComponent implements OnInit {
       // getTime = getTime.substring(getTime.length - 5, getTime.length);
       // //加上带有时间的图标标记
       const marker = new AMap.Marker({
-        position: [detail.Longitude, detail.Lattitude],
+        position: positon,
         // icon: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',  //32*32
         icon: './assets/images/pin.png'
       });
       this.map.add(marker);
-      this.drawnPath.push(marker);
+      this.markers.push(marker);
       if (index > 0) {
         const typhonPath = [
           [this.selectedTyphoon.TyphoonStormDetail[index - 1].Longitude, this.selectedTyphoon.TyphoonStormDetail[index - 1].Lattitude],
-          [detail.Longitude, detail.Lattitude]
+          positon
         ];
         let color = 'red';
         if (this.selectedTyphoon.TyphoonStormDetail[index].Class === '1') {
@@ -245,9 +247,9 @@ export class AppComponent implements OnInit {
           strokeWeight: 2,
         });
         this.map.add(polyLine);
-        this.drawnPath.push(polyLine);
+        this.markers.push(polyLine);
       } else {
-        this.map.setCenter([detail.Longitude, detail.Lattitude]);
+        this.map.setCenter(positon);
         this.map.setZoom(5);
       }
 
@@ -268,4 +270,15 @@ export class AppComponent implements OnInit {
   // private drawPath(): void {
   //
   // }
+
+  /*
+    function compute(){
+        var point = marker.getPosition();
+        var isPointInRing = AMap.GeometryUtil.isPointInRing(point,path);
+        marker.setLabel({
+            content:isPointInRing?'内部':'外部',
+            offset:new AMap.Pixel(20,0)
+        });
+    }
+   */
 }
